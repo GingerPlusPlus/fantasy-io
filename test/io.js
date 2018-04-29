@@ -17,6 +17,8 @@ function run(a) {
     return a.unsafePerform();
 }
 
+const symbol = Symbol();
+
 exports.io = {
 
     // Applicative Functor tests
@@ -35,5 +37,22 @@ exports.io = {
     'All (Monad)': monad.laws(λ)(IO, run),
     'Left Identity (Monad)': monad.leftIdentity(λ)(IO, run),
     'Right Identity (Monad)': monad.rightIdentity(λ)(IO, run),
-    'Associativity (Monad)': monad.associativity(λ)(IO, run)
+    'Associativity (Monad)': monad.associativity(λ)(IO, run),
+
+
+    'Works when unsafePerform returns Promise'(test) {
+        test.expect(1)
+        IO(async () => symbol).chain(val => IO(() => {
+            test.strictEqual(val, symbol)
+            test.done()
+        })).unsafePerform()
+    },
+
+    'Passes env to chained monads'(test) {
+        test.expect(1)
+        IO.of().chain(() => IO(env => {
+            test.strictEqual(env, symbol)
+            test.done()
+        })).unsafePerform(symbol)
+    },
 };

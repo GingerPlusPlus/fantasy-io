@@ -10,7 +10,7 @@ const IO = daggy.tagged('unsafePerform');
 IO[of] = (x) => IO(constant(x));
 
 IO.prototype[chain] = function(g) {
-    return IO(() => g(this.unsafePerform()).unsafePerform());
+    return IO(async env => g(await this.unsafePerform(env)).unsafePerform(env));
 };
 
 // Derived
